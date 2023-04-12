@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/therecipe/qt/core"
@@ -15,40 +14,39 @@ func main() {
 	// Create main window
 	window := widgets.NewQMainWindow(nil, 0)
 	window.SetWindowTitle("Project X Launcher")
-	window.SetMinimumSize2(400, 300)
+	window.SetMinimumSize2(500, 500)
+	window.SetMaximumSize2(1600, 1600)
+	// Window background
+	window.SetStyleSheet("background-color: #1E1E1E;")
 
 	// Create widgets
-	label := widgets.NewQLabel2("Welcome to Project X Launcher", nil, 0)
+	label := widgets.NewQLabel2("Project X Launcher", nil, 0)
 	label.SetAlignment(core.Qt__AlignCenter)
+	label.SetStyleSheet("background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #67CEF6, stop:1 #43EB3D); color: #F0F0F0; font: bold 80px Arial;")
+	label.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+	label.SetFixedHeight(100)
+	label.SetWordWrap(true)
 
 	// Microsoft Auth button
-	microsoftAuthBtn := widgets.NewQPushButton2("", nil)
-	microsoftAuthBtn.SetStyleSheet("background-color: black; color: white; padding: 10px;")
-	microsoftAuthBtn.SetSizePolicy2(widgets.QSizePolicy__MinimumExpanding, widgets.QSizePolicy__Fixed)
+	microsoftAuthBtn := widgets.NewQPushButton2("Sign in with Microsoft", nil)
+	microsoftAuthBtn.SetStyleSheet("background-color: #2E2E2E; color: #F0F0F0; border: 1px solid #505050; border-radius: 5px; border-radius: 15px; font: bold 14px Arial;")
+	microsoftAuthBtn.SetFixedSize2(200, 30)
+	microsoftAuthBtn.SetIcon(gui.NewQIcon5("ms.png"))
+	microsoftAuthBtn.SetIconSize(core.NewQSize2(20, 20))
+	microsoftAuthBtn.SetFlat(true)
 
-	icon := gui.NewQIcon5(":/ms.png")
-	microsoftAuthBtn.SetIcon(icon)
-	microsoftAuthBtn.SetIconSize(core.NewQSize2(25, 25))
+	// Create a vertical layout for window
+	vLayout := widgets.NewQVBoxLayout()
+	vLayout.AddStretch(1)                                        // Add stretchable space at the top
+	vLayout.AddWidget(label, 0, core.Qt__AlignCenter)            // Add label centered at the top
+	vLayout.AddStretch(1)                                        // Add stretchable space in the middle
+	vLayout.AddWidget(microsoftAuthBtn, 0, core.Qt__AlignCenter) // Add button centered in the middle
 
-	labelText := widgets.NewQLabel2("Microsoft Auth", nil, 0)
-	labelText.SetStyleSheet("margin-left: 10px;")
-
-	layout := widgets.NewQHBoxLayout()
-	layout.SetContentsMargins(0, 0, 0, 0)
-	layout.AddWidget(microsoftAuthBtn, 0, 0)
-	layout.AddWidget(labelText, 0, 0)
-
+	// Create a widget to hold the layout
 	widget := widgets.NewQWidget(nil, 0)
-	widget.SetLayout(layout)
+	widget.SetLayout(vLayout)
 
-	microsoftAuthBtn.ConnectClicked(func(bool) {
-		// Call the Microsoft Auth function here
-		fmt.Println("Microsoft Auth button clicked")
-	})
-
-	// Add widgets to window
-	window.SetCentralWidget(label)
-
+	// Set the widget as the central widget of the window
 	window.SetCentralWidget(widget)
 
 	// Show window
