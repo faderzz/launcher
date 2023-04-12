@@ -21,22 +21,7 @@ func main() {
 
 	// Login Functions
 	// Contains Microsoft Auth +
-	// Mojang Auth
-
-	// Mojang Auth
-	// Email input
-	emailInput := widgets.NewQLineEdit(nil)
-	emailInput.SetPlaceholderText("Email")
-	// Password input
-	passwordInput := widgets.NewQLineEdit(nil)
-	passwordInput.SetPlaceholderText("Password")
-	passwordInput.SetEchoMode(2) // Password
-	// Login button
-	loginBtn := widgets.NewQPushButton2("Login", nil)
-	loginBtn.ConnectClicked(func(bool) {
-		// Call the login function here
-		fmt.Println("Login button clicked")
-	})
+	// Styling
 
 	// Microsoft Auth
 	// Microsoft Auth button
@@ -46,17 +31,17 @@ func main() {
 		fmt.Println("Microsoft Auth button clicked")
 	})
 
-	playBtn := widgets.NewQPushButton2("Play", nil)
-	playBtn.ConnectClicked(func(bool) {
-		// Call the play function here
-		fmt.Println("Play button clicked")
-	})
-
 	// Step 3: Add widgets to window
 	window.SetCentralWidget(label)
 
 	layout := widgets.NewQVBoxLayout()
+
+	layout.AddWidget(emailInput, 0, 0)
+	layout.AddWidget(passwordInput, 0, 0)
 	layout.AddWidget(loginBtn, 0, 0)
+
+	layout.AddWidget(microsoftAuthBtn, 0, 0)
+
 	layout.AddWidget(playBtn, 0, 0)
 
 	widget := widgets.NewQWidget(nil, 0)
