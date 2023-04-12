@@ -26,7 +26,7 @@ func main() {
 	// Custom top bar
 	topBar := widgets.NewQWidget(nil, 0)
 	topBar.SetFixedHeight(30)
-	topBar.SetStyleSheet("background-color: #2E2E2E;")
+	topBar.SetStyleSheet("background-color: #1E1E1E;")
 
 	// Custom top bar buttons
 	closeBtn := widgets.NewQPushButton2("X", nil)
@@ -36,7 +36,7 @@ func main() {
 	closeBtn.ConnectClicked(func(checked bool) {
 		window.Close()
 	})
-	minimizeBtn := widgets.NewQPushButton2("_", nil)
+	minimizeBtn := widgets.NewQPushButton2("-", nil)
 	minimizeBtn.SetStyleSheet("color: #F0F0F0; font: bold 14px Arial;")
 	minimizeBtn.SetFixedSize2(30, 30)
 	minimizeBtn.SetFlat(true)
@@ -90,9 +90,9 @@ func main() {
 	label.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	label.SetFixedHeight(100)
 	// Set label width to fit the pixmap
-	label.SetFixedWidth(pixmap.Width())
+	label.SetFixedWidth((pixmap.Width() + 200))
 	// Set height of label to fit the pixmap
-	label.SetFixedHeight(pixmap.Height())
+	label.SetFixedHeight((pixmap.Height() + 100))
 
 	// Microsoft Auth button
 	microsoftAuthBtn := widgets.NewQPushButton2("Sign in with Microsoft", nil)
@@ -118,7 +118,8 @@ func main() {
 	// Click function
 	microsoftAuthBtn.ConnectClicked(func(checked bool) {
 		// TODO: Implement Microsoft Auth
-		println("Microsoft Auth")
+		// Call the Microsoft Auth function in the auth.go file
+		microsoftAuth()
 	})
 
 	// Create a vertical layout for window
