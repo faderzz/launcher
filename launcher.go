@@ -14,8 +14,8 @@ func main() {
 	// Create main window
 	window := widgets.NewQMainWindow(nil, 0)
 	window.SetWindowTitle("Project X Launcher")
-	window.SetMinimumSize2(500, 500)
-	window.SetMaximumSize2(1600, 1600)
+	window.SetMinimumSize2(1250, 800)
+	window.SetMaximumSize2(1250, 800)
 	// Window background
 	window.SetStyleSheet("background-color: #1E1E1E;")
 
@@ -26,7 +26,10 @@ func main() {
 	label.SetAlignment(core.Qt__AlignCenter)
 	label.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	label.SetFixedHeight(100)
-	label.SetStyleSheet("width: 100%;")
+	// Set label width to fit the pixmap
+	label.SetFixedWidth(pixmap.Width())
+	// Set height of label to fit the pixmap
+	label.SetFixedHeight(pixmap.Height())
 
 	// Microsoft Auth button
 	microsoftAuthBtn := widgets.NewQPushButton2("Sign in with Microsoft", nil)
