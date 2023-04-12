@@ -16,12 +16,71 @@ func main() {
 	window.SetWindowTitle("Project X Launcher")
 	window.SetMinimumSize2(1250, 800)
 	window.SetMaximumSize2(1250, 800)
+
 	// Window background
 	window.SetStyleSheet("background-color: #1E1E1E;")
 
 	// Custom window buttons
 	window.SetWindowFlags(core.Qt__FramelessWindowHint)
-	// Exit button
+
+	// Custom top bar
+	topBar := widgets.NewQWidget(nil, 0)
+	topBar.SetFixedHeight(30)
+	topBar.SetStyleSheet("background-color: #2E2E2E;")
+
+	// Custom top bar buttons
+	closeBtn := widgets.NewQPushButton2("X", nil)
+	closeBtn.SetStyleSheet("color: #F0F0F0; font: bold 14px Arial;")
+	closeBtn.SetFixedSize2(30, 30)
+	closeBtn.SetFlat(true)
+	closeBtn.ConnectClicked(func(checked bool) {
+		window.Close()
+	})
+	minimizeBtn := widgets.NewQPushButton2("_", nil)
+	minimizeBtn.SetStyleSheet("color: #F0F0F0; font: bold 14px Arial;")
+	minimizeBtn.SetFixedSize2(30, 30)
+	minimizeBtn.SetFlat(true)
+	minimizeBtn.ConnectClicked(func(checked bool) {
+		window.ShowMinimized()
+	})
+
+	// Custom top bar layout
+	topBarLayout := widgets.NewQHBoxLayout()
+	topBarLayout.AddStretch(0)
+	topBarLayout.AddWidget(minimizeBtn, 0, 0)
+	topBarLayout.AddWidget(closeBtn, 0, 0)
+	topBar.SetLayout(topBarLayout)
+
+	// Custom top bar drag
+	topBar.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
+		window.MousePressEvent(event)
+	})
+	topBar.ConnectMouseMoveEvent(func(event *gui.QMouseEvent) {
+		window.MouseMoveEvent(event)
+	})
+	topBar.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
+		window.MouseReleaseEvent(event)
+	})
+
+	// Hover change color
+	closeBtn.ConnectEnterEvent(func(event *core.QEvent) {
+		closeBtn.SetStyleSheet("color: #404040; font: bold 14px Arial;")
+		// Change mouse cursor to hand
+		closeBtn.SetCursor(gui.NewQCursor2(core.Qt__PointingHandCursor))
+	})
+	minimizeBtn.ConnectEnterEvent(func(event *core.QEvent) {
+		minimizeBtn.SetStyleSheet("color: #404040; font: bold 14px Arial;")
+		// Change mouse cursor to hand
+		minimizeBtn.SetCursor(gui.NewQCursor2(core.Qt__PointingHandCursor))
+	})
+
+	// Change back to normal color
+	closeBtn.ConnectLeaveEvent(func(event *core.QEvent) {
+		closeBtn.SetStyleSheet("color: #F0F0F0; font: bold 14px Arial;")
+	})
+	minimizeBtn.ConnectLeaveEvent(func(event *core.QEvent) {
+		minimizeBtn.SetStyleSheet("color: #F0F0F0; font: bold 14px Arial;")
+	})
 
 	// Create widgets
 	label := widgets.NewQLabel(nil, 0)
@@ -64,6 +123,7 @@ func main() {
 
 	// Create a vertical layout for window
 	vLayout := widgets.NewQVBoxLayout()
+	vLayout.AddWidget(topBar, 0, 0)
 	vLayout.AddStretch(1)
 	vLayout.AddWidget(label, 0, core.Qt__AlignCenter)
 	vLayout.AddStretch(1)
