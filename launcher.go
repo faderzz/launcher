@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"os"
 
 	"github.com/therecipe/qt/core"
@@ -21,41 +22,55 @@ func main() {
 	label := widgets.NewQLabel2("Welcome to Project X Launcher", nil, 0)
 	label.SetAlignment(core.Qt__AlignCenter)
 
-	// Microsoft Auth
-	// Create a container widget for the button with a horizontal layout
-	microsoftAuthContainer := widgets.NewQWidget(nil, 0)
-	microsoftAuthContainer.SetSizePolicy2(widgets.QSizePolicy__Minimum, widgets.QSizePolicy__Minimum)
-	microsoftAuthContainer.SetStyleSheet("background-color: #000000; border-radius: 5px;")
-
-	// Create an image label for the left half of the button
-	imageLabel := widgets.NewQLabel(nil, 0)
-	imageLabel.SetPixmap(gui.NewQPixmap3(":/ms.png", "", core.Qt__AutoColor))
-	imageLabel.SetScaledContents(true)
-	imageLabel.SetFixedSize2(25, 25)
-	imageLabel.SetAlignment(core.Qt__AlignCenter)
-
-	// Create a label for the right half of the button with the text
-	textLabel := widgets.NewQLabel2("Sign in with Microsoft", nil, 0)
-	textLabel.SetAlignment(core.Qt__AlignCenter)
-
-	// Add the image label and text label to the container widget
-	containerLayout := widgets.NewQHBoxLayout2(microsoftAuthContainer)
-	containerLayout.AddWidget(imageLabel, 0, core.Qt__AlignLeft)
-	containerLayout.AddWidget(textLabel, 0, core.Qt__AlignRight)
-	microsoftAuthContainer.SetLayout(containerLayout)
-
 	// Microsoft Auth button
 	microsoftAuthBtn := widgets.NewQPushButton(nil)
 	microsoftAuthBtn.SetSizePolicy2(widgets.QSizePolicy__Minimum, widgets.QSizePolicy__Minimum)
 	microsoftAuthBtn.SetFlat(true)
-	microsoftAuthBtn.SetAutoFillBackground(false)
-	microsoftAuthBtn.SetStyleSheet("border: none;")
+	microsoftAuthBtn.SetAutoFillBackground(true)
+	microsoftAuthBtn.SetStyleSheet("background-color: black; color: white; border: none; padding: 0;")
 	microsoftAuthBtn.SetMinimumSize2(200, 50)
-	microsoftAuthBtn.SetCursor(gui.NewQCursor(core.Qt__PointingHandCursor))
-	microsoftAuthBtn.SetFocusPolicy(core.Qt__NoFocus)
 
-	microsoftAuthBtn.SetIconSize(core.NewQSize2(25, 25))
-	microsoftAuthBtn.SetIcon(gui.NewQIcon5(":/ms.png"))
+	// Load the image from file
+	imageFile, err := os.Open("ms.png")
+	if err != nil {
+		fmt.Println("Failed to open image:", err)
+		return
+	}
+	defer imageFile.Close()
+
+	image, _, err := image.Decode(imageFile)
+	if err != nil {
+		fmt.Println("Failed to decode image:", err)
+		return
+	}
+
+	// Convert the image to a QPixmap
+	pixmap := gui.NewQPixmap3(image)
+	if pixmap.IsNull() {
+		fmt.Println("Failed to create QPixmap from image")
+		return
+	}
+
+	// Create a QLabel for the image on the left half
+	imageLabel := widgets.NewQLabel(nil, 0)
+	imageLabel.SetPixmap(pixmap)
+	imageLabel.SetScaledContents(true)
+
+	// Create a QLabel for the text on the right half
+	textLabel := widgets.NewQLabel2("Microsoft Auth", nil, 0)
+	textLabel.SetAlignment(core.Qt__AlignCenter)
+
+	// Create a QHBoxLayout for the button's layout
+	layout := widgets.NewQHBoxLayout()
+	layout.SetContentsMargins(0, 0, 0, 0)
+	layout.AddWidget(imageLabel, 0, 0)
+	layout.AddWidget(textLabel, 0, 0)
+
+	// Set the layout for the button
+	buttonWidget := widgets.NewQWidget(nil, 0)
+	buttonWidget.SetLayout(layout)
+	microsoftAuthBtn.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Minimum)
+	microsoftAuthBtn.SetLayout(layout)
 
 	microsoftAuthBtn.ConnectClicked(func(bool) {
 		// Call the Microsoft Auth function here
