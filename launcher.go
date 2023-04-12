@@ -20,12 +20,13 @@ func main() {
 	window.SetStyleSheet("background-color: #1E1E1E;")
 
 	// Create widgets
-	label := widgets.NewQLabel2("Project X Launcher", nil, 0)
+	label := widgets.NewQLabel(nil, 0)
+	pixmap := gui.NewQPixmap3("logo.png", "", core.Qt__AutoColor)
+	label.SetPixmap(pixmap)
 	label.SetAlignment(core.Qt__AlignCenter)
-	label.SetStyleSheet("background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #67CEF6, stop:1 #43EB3D); color: #F0F0F0; font: bold 80px Arial;")
 	label.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	label.SetFixedHeight(100)
-	label.SetWordWrap(true)
+	label.SetStyleSheet("width: 100%;")
 
 	// Microsoft Auth button
 	microsoftAuthBtn := widgets.NewQPushButton2("Sign in with Microsoft", nil)
@@ -37,10 +38,10 @@ func main() {
 
 	// Create a vertical layout for window
 	vLayout := widgets.NewQVBoxLayout()
-	vLayout.AddStretch(1)                                        // Add stretchable space at the top
-	vLayout.AddWidget(label, 0, core.Qt__AlignCenter)            // Add label centered at the top
-	vLayout.AddStretch(1)                                        // Add stretchable space in the middle
-	vLayout.AddWidget(microsoftAuthBtn, 0, core.Qt__AlignCenter) // Add button centered in the middle
+	vLayout.AddStretch(1)
+	vLayout.AddWidget(label, 0, core.Qt__AlignCenter)
+	vLayout.AddStretch(1)
+	vLayout.AddWidget(microsoftAuthBtn, 0, core.Qt__AlignCenter)
 
 	// Create a widget to hold the layout
 	widget := widgets.NewQWidget(nil, 0)
