@@ -117,7 +117,6 @@ func main() {
 
 	// Click function
 	microsoftAuthBtn.ConnectClicked(func(checked bool) {
-		// TODO: Implement Microsoft Auth
 		// Call the Microsoft Auth function in the auth.go file
 		go microsoftAuth()
 	})
