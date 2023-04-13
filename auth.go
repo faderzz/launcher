@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,9 +10,21 @@ import (
 	"github.com/pkg/browser"
 )
 
+type LoginWithXboxRequest struct {
+	IdentityToken string `json:"identityToken"`
+}
+
+type LoginWithXboxResponse struct {
+	Username    string   `json:"username"`
+	Roles       []string `json:"roles"`
+	AccessToken string   `json:"access_token"`
+	TokenType   string   `json:"token_type"`
+	ExpiresIn   int      `json:"expires_in"`
+}
+
 func microsoftAuth() {
 	// Define client credentials
-	const ClientID = "" // Replace with your own client ID
+	const ClientID = "3aa1025b-23c2-4a38-9faf-3d5f795fa58b" // Replace with your own client ID
 	// Microsoft authentication endpoint with Xbox Live scope
 	const AuthURL = "https://login.live.com/oauth20_authorize.srf?response_type=code&client_id=" + ClientID + "&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=XboxLive.signin%20offline_access"
 
@@ -62,8 +75,47 @@ func microsoftAuth() {
 
 		// Store access token in variable
 		accessToken := m["access_token"].(string)
-		// Run function authenticateWithXboxLive in func/getXLSXToken.go
-		authenticateWithXboxLive(accessToken)
+		// Get xblToken and userHash and xlsxToken
+		xstsToken, userHash, err := authenticateWithXboxLive(accessToken)
+
+		// Create a request body with the identity token
+		loginReq := LoginWithXboxRequest{
+			IdentityToken: fmt.Sprintf("XBL3.0 x=%s;%s", userHash, xstsToken),
+		}
+
+		// Marshal the request body to JSON
+		loginReqBytes, err := json.Marshal(loginReq)
+		if err != nil {
+			fmt.Println("Failed to marshal login request:", err)
+			return
+		}
+
+		// Send a POST request to the login_with_xbox endpoint
+		resp, err = http.Post("https://api.minecraftservices.com/authentication/login_with_xbox", "application/json", bytes.NewBuffer(loginReqBytes))
+		if err != nil {
+			fmt.Println("Failed to send login request:", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Check the response status code
+		if resp.StatusCode != http.StatusOK {
+			fmt.Println("Failed to authenticate with Minecraft:", resp.Status)
+			return
+		}
+
+		// Decode the response body to a LoginWithXboxResponse struct
+		var loginResp LoginWithXboxResponse
+		err = json.NewDecoder(resp.Body).Decode(&loginResp)
+		if err != nil {
+			fmt.Println("Failed to decode login response:", err)
+			return
+		}
+
+		// Extract the access token from the response
+		MCaccessToken := loginResp.AccessToken
+		fmt.Println("Minecraft access token:", MCaccessToken)
+
 	})
 
 	// Open the browser
