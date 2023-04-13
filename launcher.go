@@ -119,7 +119,7 @@ func main() {
 	microsoftAuthBtn.ConnectClicked(func(checked bool) {
 		// TODO: Implement Microsoft Auth
 		// Call the Microsoft Auth function in the auth.go file
-		microsoftAuth()
+		go microsoftAuth()
 	})
 
 	// Create a vertical layout for window
