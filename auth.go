@@ -21,6 +21,11 @@ type LoginWithXboxResponse struct {
 	ExpiresIn   int      `json:"expires_in"`
 }
 
+type AccessTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 func microsoftAuth() {
 	// Define client credentials
 	const ClientID = "3aa1025b-23c2-4a38-9faf-3d5f795fa58b"         // Replace with your own client ID
@@ -46,40 +51,66 @@ func microsoftAuth() {
 		return
 	}
 
-	// Get access token
-	const url = "https://login.live.com/oauth20_token.srf"
-	// Data
-	data := "client_id=" + ClientID + "&redirect_uri=http://localhost:8080&client_secret=" + ClientSecret + "&grant_type=authorization_code&code=" + code
-
-	// Create a POST request with url, headers and data
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
+	// Get access token and refresh token
+	accessToken, refreshToken, err := getAccessTokenAndRefreshToken(code)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
-	// Set the headers
+	fmt.Println("accessToken: " + accessToken)
+	fmt.Println("refreshToken: " + refreshToken)
+}
+
+func getAccessTokenAndRefreshToken(code string) (string, string, error) {
+	const url = "https://login.live.com/oauth20_token.srf"
+
+	// Define request payload
+	data := map[string]string{
+		"client_id": "3aa1025b-23c2-4a38-9faf-3d5f795fa58b",
+		// "client_id":    "e06d23de-38f1-42a8-84bb-df59258ada2f",
+		"redirect_uri": "http://localhost:8080",
+		"secret_value": "VTq8Q~9a6q.bZsL1AqQIPnhQspKo25Qa2n2l6b2X",
+		"grant_type":   "authorization_code",
+		"code":         code,
+	}
+
+	// Marshal payload to JSON
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Create HTTP request
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	if err != nil {
+		return "", "", err
+	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	// Send the request
+
+	// Send HTTP request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return
+		return "", "", err
 	}
 	defer resp.Body.Close()
-	// Print the response
-	fmt.Println(resp)
-	// Check if the response is OK
-	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Error: " + resp.Status)
-		return
-	}
-	// Decode the response
-	var result map[string]interface{}
-	err = json.NewDecoder(resp.Body).Decode(&result)
+
+	// Parse response JSON
+	var accessTokenResponse AccessTokenResponse
+	err = json.NewDecoder(resp.Body).Decode(&accessTokenResponse)
 	if err != nil {
-		return
+		return "", "", err
 	}
-	// Print the access token
-	fmt.Println("Access token: " + result["access_token"].(string))
-	// Print the refresh token
-	fmt.Println("Refresh token: " + result["refresh_token"].(string))
+
+	// Extract access token and refresh token
+	accessToken := accessTokenResponse.AccessToken
+	refreshToken := accessTokenResponse.RefreshToken
+
+	// Check status code
+	if resp.StatusCode != 200 {
+		fmt.Println(resp)
+		return "", "", fmt.Errorf("Status code: %d", resp.StatusCode)
+	}
+
+	return accessToken, refreshToken, nil
 }
